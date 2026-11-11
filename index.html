@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<!--
+  KI-assistiert erstellt unter Verwendung des "learning-artifacts-builder (lab-o5)"-Skills, angepasst als Vibe-Coding-Lab-Skill
+  Lizenz: CC BY-SA 4.0 (Dominik Kluge), https://creativecommons.org/licenses/by-sa/4.0/
+  Sie dürfen: Teilen, Bearbeiten
+  Bedingungen: Namensnennung, Weitergabe unter gleichen Bedingungen
+-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weltwirtschaftskrise 1929</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" id="skip" href="#main">Zum Inhalt springen</a>
+
+<header class="top">
+  <div class="brand">
+    <h1 id="title">Weltwirtschaftskrise 1929</h1>
+    <p id="sub"></p>
+  </div>
+  <div class="tools">
+    <div class="lang" id="lang" role="group" aria-label="Sprache">
+      <button type="button" id="lang-de" lang="de" aria-pressed="true">Deutsch</button>
+      <button type="button" id="lang-en" lang="en" aria-pressed="false">English</button>
+    </div>
+    <button type="button" class="btn" id="gloss-open">Wortspeicher</button>
+  </div>
+</header>
+
+<div class="stick">
+  <nav aria-label="Kapitel / Chapters"><ol id="steps"></ol></nav>
+  <div class="progress">
+    <div id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="16" aria-valuenow="0"><div id="barfill"></div></div>
+    <span id="bartext"></span>
+  </div>
+</div>
+
+<main id="main" tabindex="-1"></main>
+
+<footer>
+  <button type="button" id="foot-btn" aria-expanded="false" aria-controls="foot-body">Quellen, Daten und Lizenz</button>
+  <div id="foot-body" hidden></div>
+</footer>
+
+<dialog id="gloss" aria-labelledby="gloss-title">
+  <h2 id="gloss-title">Wortspeicher</h2>
+  <dl id="gloss-list"></dl>
+  <button type="button" class="btn primary" id="gloss-close">Schließen</button>
+</dialog>
+
+<div id="print-area"></div>
+
+<script src="vendor/d3.min.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/land.js"></script>
+<script src="js/model.js"></script>
+<script src="js/content.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/globe.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
