@@ -10,7 +10,7 @@
 */
 (function () {
   'use strict';
-  var C = window.Content, M = window.CrisisModel, Charts = window.Charts;
+  var C = window.Content, M = window.CrisisModel, Charts = window.Charts, WC = window.WorldContent;
   var KEY = 'crisis1929-v1';
   // Display order of the decision options (so the historical choice is not always first).
   var ORDER = { d1: [1, 0, 2], d2: [0, 2, 1], d3: [2, 0, 1], d4: [1, 0, 2], d5: [1, 0], d6: [0, 1] };
@@ -18,7 +18,8 @@
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function fresh() {
     return { lang: 'de', page: 0, quiz: {}, rec: {}, notes: {}, dec: {}, policy: clone(M.HISTORICAL_POLICY),
-      mis: {}, spiral: -1, spiralSeen: [], lab: { m: 100, g: 100 }, year: 0, q: 17, name: '', trans: {} };
+      mis: {}, spiral: -1, spiralSeen: [], lab: { m: 100, g: 100 }, year: 0, q: 17, name: '', trans: {},
+      world: { city: 'ny', time: 'a', met: {}, asked: {}, list: false, speech: false, tr: false } };
   }
   var S = fresh();
   try {
@@ -56,15 +57,16 @@
 
   var ALL_QUIZ = C.money.quiz.concat(C.sources.map(function (s) { return s.quiz; }));
   var PAGE_QUIZ = { money: C.money.quiz.map(function (q) { return q.id; }), sources: C.sources.map(function (s) { return s.quiz.id; }) };
-  var globe = null;
+  var globe = null, world = null;
 
   /* ---------- progress ---------- */
   function quizDone(id) { return !!S.rec[id]; }
   function countDone() {
     return ALL_QUIZ.filter(function (q) { return quizDone(q.id); }).length +
-      C.decisions.filter(function (d) { return S.dec[d.id] !== undefined; }).length;
+      C.decisions.filter(function (d) { return S.dec[d.id] !== undefined; }).length +
+      WC.cities.filter(function (c) { return window.World.cityDone(WC, S.world, c.id); }).length;
   }
-  function total() { return ALL_QUIZ.length + C.decisions.length; }
+  function total() { return ALL_QUIZ.length + C.decisions.length + WC.cities.length; }
   function updateProgress() {
     var n = countDone(), bar = $('bar');
     bar.setAttribute('aria-valuenow', n); bar.setAttribute('aria-valuemax', total());
@@ -169,7 +171,19 @@
     return page;
   }
 
-  /* ---------- page 2: money and prices ---------- */
+  /* ---------- page 2: the walkable 3D world ---------- */
+  function pageWorld() {
+    var host = h('div', {});
+    var page = h('div', {},
+      h('p', { class: 'lead' }, t(WC.ui.intro)),
+      h('section', { class: 'card' }, host),
+      h('section', { class: 'card' }, h('h3', {}, t(WC.ui.note)),
+        WC.cities.map(function (c) { return notes('w-' + c.id, t(c.prompt), 3); })));
+    world = window.World.create(host, { W: WC, state: S.world, lang: S.lang, onChange: function () { save(); updateProgress(); } });
+    return page;
+  }
+
+  /* ---------- page 3: money and prices ---------- */
   function pageMoney() {
     var D = C.money;
     var labHost = h('div', { class: 'chart' }), stateBox = h('p', { class: 'msg', role: 'status' });
@@ -313,7 +327,7 @@
   function pageDecide() {
     var go = h('button', { type: 'button', class: 'btn primary', on: { click: function () {
       if (!allDecided()) { return; }
-      S.policy = minePolicy(); S.q = 17; save(); goPage(4);
+      S.policy = minePolicy(); S.q = 17; save(); goPage(5);
     } } }, ui('toSim') + ' →');
     var hint = h('p', { class: 'small', role: 'status' });
     paintGo = function () {
@@ -440,10 +454,14 @@
     var noteRows = [noteRow('start', t(C.start.think))]
       .concat(C.sources.map(function (s, i) { return noteRow(s.id, (S.lang === 'de' ? 'Quelle ' : 'Source ') + (i + 1) + ': ' + t(s.title)); }))
       .concat(W.reflect.map(function (r) { return noteRow(r.id, t(r)); }));
+    var worldRows = WC.cities.map(function (c) {
+      var v = (S.notes['w-' + c.id] || '').trim(), met = c.npcs.filter(function (n) { return S.world.met[n.id]; }).length;
+      return { task: t(c.prompt), answer: v || dash, solution: dash, tries: dash, status: met + ' / ' + c.npcs.length + ' ' + t(WC.ui.people) };
+    });
     var simRows = [{ task: t(W.simRow), answer: policyText(S.policy) + ' → ' + outcomeText(M.simulate(S.policy)),
       solution: ui('historical') + ': ' + policyText(M.HISTORICAL_POLICY), tries: dash,
       status: C.sim.missions.map(function (m) { return (S.mis[m.id] ? '✓ ' : '○ ') + t(m); }).join(' | ') }];
-    return [{ title: t(W.secQuiz), rows: quizRows }, { title: t(W.secDecide), rows: decRows },
+    return [{ title: t(WC.ui.secWorld), rows: worldRows }, { title: t(W.secQuiz), rows: quizRows }, { title: t(W.secDecide), rows: decRows },
       { title: t(W.secNotes), rows: noteRows }, { title: t(W.secSim), rows: simRows }];
   }
   var COLS = ['task', 'answer', 'solution', 'tries', 'status'];
@@ -461,7 +479,8 @@
   function missing() {
     var out = [];
     ALL_QUIZ.forEach(function (q) { if (!S.rec[q.id]) { out.push(t(q.q)); } });
-    C.decisions.forEach(function (d, i) { if (S.dec[d.id] === undefined) { out.push(t(C.pages[3]) + ' ' + (i + 1) + ': ' + t(d.when)); } });
+    C.decisions.forEach(function (d, i) { if (S.dec[d.id] === undefined) { out.push(t(C.pages[4]) + ' ' + (i + 1) + ': ' + t(d.when)); } });
+    WC.cities.forEach(function (c) { if (!window.World.cityDone(WC, S.world, c.id)) { out.push(t(WC.ui.cityOpen) + ' ' + t(c.name)); } });
     return out;
   }
   function doPrint() {
@@ -508,9 +527,10 @@
   }
 
   /* ---------- frame: header, navigation, footer, glossary ---------- */
-  var PAGES = [pageStart, pageMoney, pageSources, pageDecide, pageSim, pageWrap];
+  var PAGES = [pageStart, pageWorld, pageMoney, pageSources, pageDecide, pageSim, pageWrap];
   function render(keepScroll) {
     if (globe) { globe.dispose(); globe = null; }
+    if (world) { world.dispose(); world = null; }
     document.documentElement.lang = S.lang;
     document.title = ui('appTitle');
     $('skip').textContent = ui('skip');
@@ -560,5 +580,6 @@
     $('foot-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
     $('foot-body').hidden = !open;
   });
+  window.__appDebug = function () { return world ? world.debug() : null; };
   render(true);
 })();

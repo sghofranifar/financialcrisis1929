@@ -15,6 +15,7 @@
 
   C.pages = [
     { id: 'start', de: 'Die Welt 1929', en: 'The World in 1929' },
+    { id: 'world', de: 'Zeitreise 3D', en: '3D Time Journey' },
     { id: 'money', de: 'Geld & Preise', en: 'Money & Prices' },
     { id: 'sources', de: 'Quellen', en: 'Sources' },
     { id: 'decide', de: 'Entscheiden', en: 'Decide' },
@@ -602,8 +603,8 @@
       en: 'This app: © S. Ghofranifar, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Made with AI assistance using the “learning-artifacts-builder (lab-o5)” skill by Dominik Kluge (CC BY-SA 4.0), adapted as Vibe-Coding-Lab-Skill.'
     },
     libs: {
-      de: 'Fremdmaterial mit eigener Lizenz: D3.js (ISC, © Mike Bostock), three.js (MIT, © three.js authors), Länderumrisse aus Natural Earth / world-atlas (gemeinfrei / ISC). Die Lizenztexte liegen im Ordner „vendor“.',
-      en: 'Third-party material with its own licence: D3.js (ISC, © Mike Bostock), three.js (MIT, © three.js authors), land outlines from Natural Earth / world-atlas (public domain / ISC). Licence texts are in the “vendor” folder.'
+      de: 'Fremdmaterial mit eigener Lizenz: D3.js (ISC, © Mike Bostock), three.js (MIT, © three.js authors), Babylon.js (Apache-2.0, © Babylon.js contributors), Länderumrisse aus Natural Earth / world-atlas (gemeinfrei / ISC). Die Lizenztexte liegen im Ordner „vendor“.',
+      en: 'Third-party material with its own licence: D3.js (ISC, © Mike Bostock), three.js (MIT, © three.js authors), Babylon.js (Apache-2.0, © Babylon.js contributors), land outlines from Natural Earth / world-atlas (public domain / ISC). Licence texts are in the “vendor” folder.'
     },
     dataNote: {
       de: 'Alle Zahlen sind gerundete Schulbuchwerte. Die Zitate wurden für diese App geprüft; die Übersetzungen sind eigene Arbeitsübersetzungen. KI-Ausgaben können Fehler enthalten – bitte vor dem Einsatz gegenlesen.',
